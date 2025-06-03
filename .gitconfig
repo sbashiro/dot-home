@@ -1,7 +1,17 @@
 [user]
-	name = Sergey Bashirov
-	email = some@email.com
-	signingkey = ~/.ssh/git_id_ed25519.pub
+	name = "John Doe"
+	email = "johndoe@gmail.com"
+	signingkey = /home/jodo/.ssh/git_id_ed25519.pub
+[sendemail]
+	smtpencryption = tls
+	smtpuser = "johndoe@gmail.com"
+	smtpserver = "smtp.gmail.com"
+	smtpserverport = 587
+	multiEdit = false
+[pw]
+	server = "https://patchwork.kernel.org"
+	user = jodo
+	token = 12345678901234567890
 [color]
 	ui = true
 [core]
