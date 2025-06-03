@@ -1,0 +1,189 @@
+# vim: filetype=muttrc
+
+################
+#  User setup  #
+################
+set from = "johndoe@gmail.com"
+set realname = "John Doe"
+set signature = "~/.neomutt/signature"
+
+####################
+#  Gmail Settings  #
+####################
+set imap_user = "johndoe@gmail.com"
+set smtp_url = "smtps://johndoe@gmail.com@smtp.gmail.com:465"
+source "gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.neomutt/password.gpg |"
+# Ensure TLS is enforced
+set ssl_starttls = yes
+set ssl_force_tls = yes
+
+#####################
+#  Gmail Mailboxes  #
+#####################
+set folder = "imaps://imap.gmail.com:993"
+set spoolfile = +INBOX
+set postponed = +[Gmail]/Черновики
+set record = +[Gmail]/Отправленные
+set trash = +[Gmail]/Корзина
+unset record
+mailboxes =INBOX =[Gmail]/Помеченные =[Gmail]/Отправленные =[Gmail]/Черновики =[Gmail]/Вся\ почта =[Gmail]/Спам =[Gmail]/Корзина
+set header_cache = "~/.cache/neomutt/headers"
+set message_cachedir = "~/.cache/neomutt/bodies"
+set certificate_file = "~/.cache/neomutt/certificates"
+
+#########################
+#  Index View Settings  #
+#########################
+# Sort by threads
+set sort = threads # https://neomutt.org/guide/reference#sort
+# Sort threads by last date recieved - newest first
+set sort_aux = reverse-last-date-received # https://neomutt.org/guide/reference#sort_aux
+# Show date in year/month/day hour:minute format
+  # The default index_format is:
+  #       '%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s'
+  #
+  # We replace the date field '%{%b %d}', giving:
+set index_format='%4C %Z %<[y?%<[m?%<[d?%[%H:%M ]&%[%a %d]>&%[%b %d]>&%[%m/%y ]> %-15.15L (%?l?%4l&%4c?) %s'
+  # Test  Date Range  Format String  Example
+  # --------------------------------------------
+  # %[d   Today       %[%H:%M ]      12:34
+  # %[m   This month  %[%a %d]       Thu 12
+  # %[y   This year   %[%b %d]       Dec 10
+  #  —    Older       %[%m/%y ]      06/15
+
+######################
+#  Sidebar Settings  #
+######################
+set sidebar_divider_char = '│'
+set sidebar_delim_chars = "/"
+set sidebar_short_path
+set sidebar_folder_indent
+set sidebar_visible = yes
+set sidebar_width = 24
+set sidebar_format = '%B%?F? [%F]?%* %?N?%N/? %?S?%S?'
+bind index,pager \Cj sidebar-next
+bind index,pager \Ck sidebar-prev
+bind index,pager \Co sidebar-open
+bind index,pager \Cb sidebar-toggle-visible
+
+########################
+#  Composing Settings  #
+########################
+# Use vim as an editor
+set editor = "vim" # https://neomutt.org/guide/reference#editor
+# Puts email headers in Vim
+set edit_headers = yes # https://neomutt.org/guide/reference#edit_headers
+# Go straight to vim when writing an email
+# Means that we will not be prompted for to / subject before opening email
+set autoedit = yes # https://neomutt.org/guide/reference#autoedit
+# Use From: header
+set use_from = yes # https://neomutt.org/guide/reference#use_from
+# When forwading, put Fwd: before original subject
+set forward_format = "Fwd: %s" # https://neomutt.org/guide/reference#forward_format
+# Include the forwarded message in the body
+set forward_quote = yes # https://neomutt.org/guide/reference#forward_quote
+# Decode when forwarding
+set forward_decode = yes
+# Include the replied mesaage in the body
+set include = yes # https://neomutt.org/guide/reference#include
+# This saves any mail (the . will match anything) first in the Sent folder and
+# then in the current (^) folder (for thread supporting)
+#fcc-hook . '+Sent'
+# Set User-Agent: header
+set user_agent = yes
+
+######################
+#  Viewing settings  #
+######################
+# Don't show + on wrapped lines
+set markers = no # https://neomutt.org/guide/reference#markers
+# Wrap lines at 78 chars
+set wrap = 78 # https://neomutt.org/guide/reference#wrap
+# Correct indentation for plain text
+set text_flowed = no
+# Reformat paragraphs in parts marked format=flowed
+set reflow_text = yes
+# Adds spaces after each level of quote marks
+set reflow_space_quotes = yes
+# Maximum paragraph width when reformatting
+set reflow_wrap = 78
+# No dashes before sig
+set sig_dashes = no
+# When at the end, don't go to next email when trying to scroll
+set pager_index_lines = 10
+set pager_context = 3
+set pager_stop = yes
+# Mailcap file is used to tell mutt how to open different types of file
+set mailcap_path = "~/.neomutt/mailcap" # https://neomutt.org/guide/mimesupport#3-%C2%A0mime-viewer-configuration-with-mailcap
+# Tells Mutt to automatically view files with these mime types
+auto_view text/html # https://neomutt.org/guide/reference#auto_view
+auto_view application/pgp-encrypted # https://neomutt.org/guide/reference#auto_view
+auto_view text/calendar # https://neomutt.org/guide/reference#auto_view
+# Order to try and show multipart emails
+alternative_order text/plain text/enriched text/html text
+# Macro to toggle alternates (plain <-> html), based on:
+# https://groups.google.com/d/msg/comp.mail.mutt/9I702oMwQQE/JqdLnp3j9WAJ
+macro pager ,@aoh= "<enter-command>unalternative_order *
+alternative_order text/calendar text/html text/plain text/enriched
+macro pager A ,@aot= 'toggle alternative order'<enter><exit><display-message>"
+macro pager ,@aot= "<enter-command>unalternative_order *
+alternative_order text/plain text/calendar text/enriched text/html
+macro pager A ,@aoh= 'toggle alternative order'<enter><exit><display-message>"
+macro pager A ,@aoh= "toggle alternative order"
+# Use urlscan to handle links in messages
+macro pager U "<enter-command>set pipe_decode = yes<enter><pipe-message>urlscan  -dc -r 'linkhandler {}'<enter><enter-command>set pipe_decode = no<enter>" "view URLs"
+
+#############
+#  Colours  #
+#############
+source ~/.neomutt/mutt-colors-solarized/mutt-colors-solarized-dark-256.muttrc
+
+###################
+#  Misc Settings  #
+###################
+set beep = no
+set mark_old = no
+set mail_check_stats
+set mail_check = 60                  # check for new mail every 60 seconds
+set imap_keepalive = 900             # 15 minutes
+set sleep_time = 0                   # don't sleep when idle
+set menu_scroll                      # scroll menu
+set tilde                            # use ~ to pad mutt
+set move = no                        # don't move messages when marking as read
+set wait_key = no                    # mutt won't ask "press key to continue"
+set fcc_attach                       # save attachments with the body
+set mime_forward                     # forward attachments as part of body
+# Sort by newest conversation first.
+set charset = "utf-8"
+set uncollapse_jump
+set sort_re
+set sort = reverse-threads
+set sort_aux = last-date-received
+# How we reply and quote emails.
+set attribution = "On %d, %n wrote:" # format of quoting header
+set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
+set send_charset = "utf-8:iso-8859-1:us-ascii"
+
+############################
+#  Keybindings and Macros  #
+############################
+# Vim like keybindings
+bind index G last-entry
+bind index g noop
+bind index gg first-entry
+bind pager j next-line
+bind pager k previous-line
+# Reply bindings
+bind index r reply
+bind index R group-reply
+# Collapsing / Uncollapsing threads
+bind index c collapse-thread
+bind index C collapse-all
+# Easily copy / move messages
+macro index C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
+macro index M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
+# Check Emails
+macro index A \
+    "<tag-pattern>~N<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" \
+    "mark all new as read"
